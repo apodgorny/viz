@@ -1,0 +1,40 @@
+body {
+	margin      : 0;
+	background  : #000;
+	color       : #ddd;
+	font-family : monospace;
+}
+
+#plot {
+	height : 60vh;
+}
+
+#row {
+	border-top    : 1px solid #333;
+	padding       : 12px;
+	display       : flex;
+	flex-direction: column;
+	gap           : 10px;
+	white-space   : normal;
+}
+
+.info-row {
+	display               : grid;
+	grid-template-columns : 160px 1fr;
+	gap                   : 8px 12px;
+	align-items           : flex-start;
+}
+
+.info-label {
+	min-width     : 120px;
+	font-weight   : 700;
+	color         : #aaa;
+	text-transform: lowercase;
+	justify-self  : end;
+	text-align    : right;
+}
+
+.info-value {
+	flex        : 1;
+	white-space : pre-wrap;
+}

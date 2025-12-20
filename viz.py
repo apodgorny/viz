@@ -9,50 +9,50 @@ from typing import Any
 import uvicorn
 import pandas as pd
 
-from wordwield import ww
-
-
-DATA_PATH = os.path.join(ww.config.WW_PATH, 'viz', 'json')
-HOST      = '127.0.0.1'
-PORT      = 8000
+from viz_frame  import VizFrame
+from viz_series import VizSeries
+from viz_info   import VizInfo
 
 
 class Viz:
-	@staticmethod
-	def to_json(data: Any):
-		json_data = '{}'
-		if isinstance(data, pd.DataFrame):
-			json_data = data.to_json(orient='records')
-		else:
-			json_data = json.dumps(data, ensure_ascii=False)
-		return json_data
+	Frame          = VizFrame
+	Series         = VizSeries
+	Info           = VizInfo
 
-	@staticmethod
-	def save(endpoint_name, data):
-		json_data = Viz.to_json(data)
+	HOST           = '127.0.0.1'
+	PORT           = 8000
+
+	VIZ_PATH       = os.path.abspath(os.path.dirname(__file__))
+	JSON_PATH      = os.path.join(VIZ_PATH, 'json')
+	STATIC_PATH    = os.path.join(VIZ_PATH, 'static')
+	TEMPLATES_PATH = os.path.join(VIZ_PATH, 'templates')
+
+	@classmethod
+	def save(cls, endpoint_name, frame):
+		json_data = frame.to_json()
 		md5       = hashlib.md5(json_data.encode()).hexdigest()
 
-		os.makedirs(DATA_PATH, exist_ok=True)
+		os.makedirs(cls.JSON_PATH, exist_ok=True)
 
-		data_path = os.path.join(DATA_PATH, f'{md5}.json')
+		data_path = os.path.join(cls.JSON_PATH, f'{md5}.json')
 		with open(data_path, 'w', encoding='utf-8') as f:
 			f.write(json_data)
 
-		url = f'http://{HOST}:{PORT}/{endpoint_name}/{md5}'
+		url = f'http://{cls.HOST}:{cls.PORT}/{endpoint_name}/{md5}'
 		return url
 	
-	@staticmethod
-	def run_server():
+	@classmethod
+	def run_server(cls):
 		uvicorn.run(
-			'viz_server.server:app',
-			host      = HOST,
-			port      = PORT,
+			'server:app',
+			host      = cls.HOST,
+			port      = cls.PORT,
 			log_level = 'error'
 		)
 
 	@staticmethod
-	def render(endpoint_name, data):
-		url    = Viz.save(endpoint_name, data)
+	def render(view, data):
+		url    = Viz.save(view, data)
 		thread = threading.Thread(target=Viz.run_server, daemon=True)
 
 		thread.start()

@@ -1,28 +1,38 @@
-from fastapi import FastAPI
+import os
+import json
+
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.requests import Request
-import json
-from pathlib import Path
+
+from viz import Viz
 
 
 app = FastAPI()
 
-app.mount('/static', StaticFiles(directory='viz_server/static'), name='static')
-templates = Jinja2Templates(directory='viz_server/templates')
+app.mount(
+	'/static',
+	StaticFiles(directory=Viz.STATIC_PATH),
+	name='static'
+)
+
+templates = Jinja2Templates(directory=Viz.TEMPLATES_PATH)
 
 
-@app.get('/plot/{viz_id}', response_class=HTMLResponse)
-def plot(request: Request, viz_id: str):
-	path = Path('viz_data') / f'{viz_id}.json'
+@app.get('/plot/{uid}', response_class=HTMLResponse)
+def plot(request: Request, uid: str):
+	path = os.path.join(Viz.JSON_PATH, f'{uid}.json')
 
-	data = json.loads(path.read_text())
+	with open(path, 'r', encoding='utf-8') as f:
+		json_data = f.read()
+
+	os.remove(path)
 
 	return templates.TemplateResponse(
 		'plot.html',
 		{
 			'request' : request,
-			'data'    : data
+			'data'    : json_data
 		}
 	)

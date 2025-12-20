@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Viz</title>
+
+	<link rel="stylesheet" href="/static/plot.css">
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+</head>
+<body>
+
+	<div id="plot"></div>
+	<div id="row"></div>
+
+	<script>
+		window.VIZ_DATA = {{ data | safe }};
+	</script>
+
+	<script src="/static/plot.js"></script>
+</body>
+</html>
